@@ -68,7 +68,8 @@ def preprocess_supplier_name(name: str) -> str:
     """
     name = name.lower()
     name = name.replace("&", "and")
-    name = " ".join(STATE_MAPPING.get(w, w) for w in name.split())
+    for full_name, abbreviation in STATE_MAPPING.items():
+        name = name.replace(full_name, abbreviation)
     name = " ".join(ORDINAL_MAPPING.get(w, w) for w in name.split())
     name = re.sub(r"[^a-zA-Z0-9\s]", "", name)
     name = " ".join(w for w in name.split() if w not in STOP_WORDS)
