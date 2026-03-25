@@ -10,14 +10,12 @@ import networkx as nx
 from sentence_transformers import SentenceTransformer, util
 
 
-DEFAULT_MODEL = 'all-MiniLM-L6-v2'
+DEFAULT_MODEL = "all-MiniLM-L6-v2"
 DEFAULT_THRESHOLD = 0.85
 
 
 def build_similarity_graph(
-    names: list[str],
-    model: SentenceTransformer,
-    threshold: float = DEFAULT_THRESHOLD
+    names: list[str], model: SentenceTransformer, threshold: float = DEFAULT_THRESHOLD
 ) -> nx.Graph:
     """Build a graph where edges connect names above the similarity threshold.
 
@@ -49,7 +47,7 @@ def build_similarity_graph(
 def group_suppliers(
     names: list[str],
     threshold: float = DEFAULT_THRESHOLD,
-    model_name: str = DEFAULT_MODEL
+    model_name: str = DEFAULT_MODEL,
 ) -> dict[str, str]:
     """Group similar supplier names using connected components.
 
