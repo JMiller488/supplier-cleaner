@@ -18,14 +18,11 @@ from supplier_cleaner.grouping import group_suppliers
 
 # ── Page config ───────────────────────────────────────────────────────────────
 
-st.set_page_config(
-    page_title="Supplier Cleaner",
-    page_icon="🏭",
-    layout="wide"
-)
+st.set_page_config(page_title="Supplier Cleaner", page_icon="🏭", layout="wide")
 
 
 # ── Column detection ──────────────────────────────────────────────────────────
+
 
 def detect_supplier_column(df: pd.DataFrame) -> str | None:
     """Use Mistral via Ollama to identify the supplier name column.
@@ -40,10 +37,7 @@ def detect_supplier_column(df: pd.DataFrame) -> str | None:
     Returns:
         Column name string if detected, otherwise None.
     """
-    samples = {
-        col: df[col].dropna().astype(str).head(5).tolist()
-        for col in df.columns
-    }
+    samples = {col: df[col].dropna().astype(str).head(5).tolist() for col in df.columns}
     prompt = f"""You are analyzing a spreadsheet. Here are the column names and 5 sample values from each:
 
 {samples}
@@ -53,10 +47,9 @@ Respond with ONLY the exact column name, nothing else."""
 
     try:
         response = ollama.chat(
-            model='mistral',
-            messages=[{'role': 'user', 'content': prompt}]
+            model="mistral", messages=[{"role": "user", "content": prompt}]
         )
-        detected = response['message']['content'].strip().strip('"').strip("'")
+        detected = response["message"]["content"].strip().strip('"').strip("'")
         return detected if detected in df.columns else None
     except Exception:
         return None
@@ -64,11 +57,8 @@ Respond with ONLY the exact column name, nothing else."""
 
 # ── Pipeline ──────────────────────────────────────────────────────────────────
 
-def run_pipeline(
-    df: pd.DataFrame,
-    supplier_col: str,
-    threshold: float
-) -> pd.DataFrame:
+
+def run_pipeline(df: pd.DataFrame, supplier_col: str, threshold: float) -> pd.DataFrame:
     """Run the full supplier cleaning pipeline on a DataFrame.
 
     Adds three new columns to the input DataFrame:
@@ -85,26 +75,28 @@ def run_pipeline(
         DataFrame with three new columns appended.
     """
     df = df.copy()
-    df['Supplier'] = df[supplier_col].astype(str)
-    df['Supplier preprocessed'] = df['Supplier'].apply(preprocess_supplier_name)
+    df["Supplier"] = df[supplier_col].astype(str)
+    df["Supplier preprocessed"] = df["Supplier"].apply(preprocess_supplier_name)
 
-    unique_names = df['Supplier preprocessed'].tolist()
+    unique_names = df["Supplier preprocessed"].tolist()
     supplier_groups = group_suppliers(unique_names, threshold=threshold)
 
-    df['Supplier grouped'] = df['Supplier preprocessed'].map(supplier_groups)
+    df["Supplier grouped"] = df["Supplier preprocessed"].map(supplier_groups)
     return df
 
 
 # ── UI ────────────────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     """Render the Streamlit application."""
     st.title("Supplier Name Cleaner")
-    st.caption("Upload any Excel or CSV file — Mistral will detect the supplier column automatically.")
+    st.caption(
+        "Upload any Excel or CSV file — Mistral will detect the supplier column automatically."
+    )
 
     uploaded_file = st.file_uploader(
-        "Drag and drop your file here, or click to browse",
-        type=["xlsx", "csv"]
+        "Drag and drop your file here, or click to browse", type=["xlsx", "csv"]
     )
 
     if not uploaded_file:
@@ -132,7 +124,7 @@ def main() -> None:
     supplier_col = st.selectbox(
         "Confirm or change the supplier column:",
         options=list(df.columns),
-        index=list(df.columns).index(detected) if detected else 0
+        index=list(df.columns).index(detected) if detected else 0,
     )
 
     st.write("**5 sample values from selected column:**")
@@ -146,7 +138,7 @@ def main() -> None:
         max_value=0.99,
         value=0.85,
         step=0.01,
-        help="Higher = only very similar names are grouped together"
+        help="Higher = only very similar names are grouped together",
     )
 
     # ── Run pipeline ──────────────────────────────────────────────────────────
@@ -159,9 +151,9 @@ def main() -> None:
     # ── Results ───────────────────────────────────────────────────────────────
     st.subheader("Results")
     col1, col2, col3 = st.columns(3)
-    col1.metric("Original unique suppliers", result_df['Supplier'].nunique())
-    col2.metric("After preprocessing", result_df['Supplier preprocessed'].nunique())
-    col3.metric("After grouping", result_df['Supplier grouped'].nunique())
+    col1.metric("Original unique suppliers", result_df["Supplier"].nunique())
+    col2.metric("After preprocessing", result_df["Supplier preprocessed"].nunique())
+    col3.metric("After grouping", result_df["Supplier grouped"].nunique())
 
     st.subheader("Sample of grouped names")
     sample = (
@@ -180,7 +172,7 @@ def main() -> None:
         label="Download cleaned Excel",
         data=output.getvalue(),
         file_name="cleaned_suppliers.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
 
