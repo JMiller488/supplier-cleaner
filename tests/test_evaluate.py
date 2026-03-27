@@ -10,7 +10,7 @@ can be verified without running the embedding model.
 
 import pytest
 
-from supplier_cleaner.evaluate import NamePair, ThresholdResult, precision_recall_at_threshold
+from supplier_cleaner.evaluate import NamePair, precision_recall_at_threshold
 
 
 def make_scored_pairs(similarities: list[float], matches: list[bool]):

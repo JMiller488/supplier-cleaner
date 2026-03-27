@@ -7,15 +7,17 @@ similarity, sweeps thresholds, and plots a precision/recall curve.
 Usage:
     python scripts/run_evaluation.py
 """
-print("script started")
 import csv
 import os
+from itertools import combinations
 
 import matplotlib.pyplot as plt
 
 from supplier_cleaner.evaluate import NamePair, score_pairs, sweep_thresholds
 
 DEFAULT_THRESHOLD = 0.85
+
+print("script started")
 
 
 # ---------------------------------------------------------------------------
@@ -24,28 +26,36 @@ DEFAULT_THRESHOLD = 0.85
 
 
 def load_pairs(csv_path: str) -> list[NamePair]:
-    """Load labelled name pairs from a CSV file.
+    """Load supplier names and generate all pairwise combinations.
 
-    Expects columns: name_a, name_b, match
-    The match column should contain 'True' or 'False' as strings.
+    Expects columns: supplier_name, true_name
+    Two names are a match if they share the same true_name.
+
+    For 250 names this produces ~31k pairs — large enough for robust
+    precision/recall estimation, with a realistic class imbalance
+    (most pairs are non-matches, just like real data).
 
     Args:
-        csv_path: Path to the CSV file produced by generate_synthetic.py.
+        csv_path: Path to the CSV file with supplier_name and true_name columns.
 
     Returns:
-        List of NamePair objects.
+        List of NamePair objects for every pairwise combination.
     """
-    pairs = []
+    rows = []
     with open(csv_path, newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            pairs.append(
-                NamePair(
-                    name_a=row["name_a"],
-                    name_b=row["name_b"],
-                    match=row["match"] == "True",
-                )
+            rows.append(row)
+
+    pairs = []
+    for (row_a, row_b) in combinations(rows, 2):
+        pairs.append(
+            NamePair(
+                name_a=row_a["supplier_name"],
+                name_b=row_b["supplier_name"],
+                match=row_a["true_name"] == row_b["true_name"],
             )
+        )
     return pairs
 
 
@@ -122,7 +132,7 @@ def plot_precision_recall(results, output_path: str, default_threshold: float) -
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    csv_path = "data/synthetic_pairs.csv"
+    csv_path = "data/supplier_cleaning_synthetic_250_exact.csv"
     plot_path = "data/precision_recall_curve.png"
 
     print("Loading pairs...")

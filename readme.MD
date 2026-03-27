@@ -18,18 +18,39 @@ The pipeline runs in three stages:
 
 A naive greedy approach assigns group labels based on whichever name appears first in the data — making results order-dependent and unstable. The connected components approach treats the problem as a graph problem: names are nodes, similarity above the threshold creates edges, and NetworkX finds all clusters. The result is identical regardless of input order.
 
+## Model choice
+
+The pipeline uses `all-MiniLM-L6-v2` as the default sentence transformer. This model was chosen because:
+
+- **Speed** — at 22M parameters it encodes thousands of names in seconds, making it practical for interactive use in the Streamlit app
+- **Short-text performance** — it was fine-tuned on semantic similarity tasks and performs well on short phrases, which is exactly what supplier names are
+- **Size** — the model is small enough to run on a laptop without a GPU, keeping the project accessible
+
+Larger models (e.g. `all-mpnet-base-v2`) may capture more nuance but are significantly slower — a poor tradeoff for this use case where names are typically 2-5 words.
+
+## Threshold selection
+
+The default similarity threshold of 0.85 was selected by evaluating precision and recall on a synthetic ground-truth dataset of labelled supplier name pairs. A threshold sweep across 101 values (0.0–1.0) showed that 0.85 provides a strong balance: high precision (few false merges) with good recall (most true duplicates caught). The precision-recall curve is saved to `data/precision_recall_curve.png` and can be regenerated with `python scripts/run_evaluation.py`.
+
 ## Project Structure
 ```
 supplier-cleaner/
-├── src/
-│   └── supplier_cleaner/
-│       ├── preprocessing.py   # Text normalisation
-│       ├── grouping.py        # Embedding + graph-based grouping
-│       └── app.py             # Streamlit web application
-├── notebooks/
-│   └── exploration.ipynb      # Original exploratory analysis
+├── src/supplier_cleaner/
+│   ├── preprocessing.py        # Rule-based text normalisation
+│   ├── grouping.py             # Embedding + graph-based grouping
+│   ├── evaluate.py             # Precision/recall evaluation framework
+│   └── app.py                  # Streamlit web application
+├── scripts/
+│   ├── generate_synthetic.py   # Synthetic ground truth generation
+│   └── run_evaluation.py       # Threshold sweep + plotting
 ├── tests/
-│   └── test_preprocessing.py  # Unit tests
+│   ├── test_preprocessing.py   # Preprocessing unit tests
+│   ├── test_evaluate.py        # Evaluation unit tests
+│   └── test_integration.py     # End-to-end pipeline test
+├── data/
+│   ├── synthetic_pairs.csv     # Labelled name pairs
+│   └── precision_recall_curve.png
+├── notebooks/                  # Exploratory analysis
 ├── requirements.txt
 └── README.md
 ```

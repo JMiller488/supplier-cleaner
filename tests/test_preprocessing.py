@@ -4,7 +4,6 @@ test_preprocessing.py
 Unit tests for the supplier name preprocessing pipeline.
 """
 
-import pytest
 from supplier_cleaner.preprocessing import preprocess_supplier_name
 
 
@@ -37,3 +36,12 @@ class TestPreprocessSupplierName:
 
     def test_only_stop_words(self):
         assert preprocess_supplier_name("Pty Ltd") == ""
+
+    def test_none_input(self):
+        assert preprocess_supplier_name(None) == ""
+
+    def test_nan_input(self):
+        assert preprocess_supplier_name(float("nan")) == ""
+
+    def test_numeric_input(self):
+        assert preprocess_supplier_name(42) == ""

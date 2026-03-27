@@ -66,6 +66,9 @@ def preprocess_supplier_name(name: str) -> str:
     Returns:
         Normalised supplier name string.
     """
+    if not isinstance(name, str) or not name.strip():
+        return ""
+
     name = name.lower()
     name = name.replace("&", "and")
     for full_name, abbreviation in STATE_MAPPING.items():

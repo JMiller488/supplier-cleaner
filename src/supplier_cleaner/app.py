@@ -51,6 +51,8 @@ Respond with ONLY the exact column name, nothing else."""
         )
         detected = response["message"]["content"].strip().strip('"').strip("'")
         return detected if detected in df.columns else None
+    except ConnectionError:
+        return "OLLAMA_UNAVAILABLE"
     except Exception:
         return None
 
@@ -116,7 +118,13 @@ def main() -> None:
     with st.spinner("Asking Mistral to identify the supplier column..."):
         detected = detect_supplier_column(df)
 
-    if detected:
+    if detected == "OLLAMA_UNAVAILABLE":
+        detected = None
+        st.info(
+            "Ollama is not running — column auto-detection is disabled. "
+            "Select the supplier column manually below."
+        )
+    elif detected:
         st.success(f"Mistral identified **{detected}** as the supplier column.")
     else:
         st.warning("Mistral could not confidently detect the supplier column.")
