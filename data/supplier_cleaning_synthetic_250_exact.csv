@@ -1,0 +1,251 @@
+supplier_name,true_name
+Deloitte Pty Ltd,Deloitte
+Deloitte Pty. Ltd.,Deloitte
+Deloitte Partners,Deloitte
+Deloite Pty Ltd,Deloitte
+Deloitte Australia,Deloitte
+PwC LLP,PwC
+PWC Limited,PwC
+PricewaterhouseCoopers,PwC
+KPMG LLP,KPMG
+KPMG Ltd,KPMG
+EY LLP,EY
+Ernst & Young,EY
+Ernst and Young UK,EY
+E.Y. LLP,EY
+Accenture Ltd,Accenture
+Accenture PLC,Accenture
+Accenture Consulting,Accenture
+IBM Corp,IBM
+IBM Corporation,IBM
+I.B.M.,IBM
+Microsoft Ltd,Microsoft
+Microsoft Corporation,Microsoft
+Amazon Web Services,AWS
+AWS Ltd,AWS
+Amazon Web Svcs,AWS
+Google LLC,Google
+Google UK Ltd,Google
+Gooogle LLC,Google
+Oracle Corp,Oracle
+Oracle Ltd,Oracle
+SAP SE,SAP
+SAP Systems,SAP
+S.A.P. Ltd,SAP
+Capgemini UK,Capgemini
+Cap Gemini Ltd,Capgemini
+Infosys Ltd,Infosys
+Infosys Consulting,Infosys
+Tata Consultancy Services,TCS
+TCS Ltd,TCS
+TCS UK Ltd,TCS
+Tata Consulting Services,TCS
+Wipro Ltd,Wipro
+Wipro Technologies,Wipro
+Cognizant Ltd,Cognizant
+Cognizent Ltd,Cognizant
+DXC Technology,DXC
+DXC Tech Ltd,DXC
+HCL Technologies,HCL
+Fujitsu Ltd,Fujitsu
+Fujitsu UK Ltd,Fujitsu
+Fujitsu Services,Fujitsu
+Hitachi Ltd,Hitachi
+Hitachi Systems,Hitachi
+Siemens AG,Siemens
+Siemens Ltd,Siemens
+Schneider Electric,Schneider Electric
+Schneider Electrics,Schneider Electric
+Honeywell Ltd,Honeywell
+3M Company,3M
+Three M Ltd,3M
+General Electric,GE
+GE Ltd,GE
+G.E. Ltd,GE
+Bosch Ltd,Bosch
+Robert Bosch Ltd,Bosch
+Johnson Controls,Johnson Controls
+Johnson Control Ltd,Johnson Controls
+Cisco Systems,Cisco
+Cisco Ltd,Cisco
+CISCO Ltd,Cisco
+Dell Technologies,Dell
+Dell Ltd,Dell
+HP Inc,HP
+Hewlett Packard,HP
+Lenovo Ltd,Lenovo
+Lenova Ltd,Lenovo
+Asus Ltd,Asus
+ASUS UK,Asus
+Acer Ltd,Acer
+Acer Computers,Acer
+Logitech Ltd,Logitech
+Canon Ltd,Canon
+Canon Inc,Canon
+Sony Ltd,Sony
+Sony Corporation,Sony
+Panasonic Ltd,Panasonic
+LG Electronics,LG
+LG Ltd,LG
+Samsung Electronics,Samsung
+Samsung Ltd,Samsung
+Nokia Ltd,Nokia
+Nokia Corporation,Nokia
+Ericsson Ltd,Ericsson
+Ericcson Ltd,Ericsson
+Vodafone Ltd,Vodafone
+Vodaphone Ltd,Vodafone
+BT Group,BT
+British Telecom,BT
+Telstra Ltd,Telstra
+Telstra Corporation,Telstra
+Telstra Pty Ltd,Telstra
+Telstra Australia,Telstra
+Optus Ltd,Optus
+Optus Pty Ltd,Optus
+AT&T Inc,AT&T
+ATT Inc,AT&T
+Verizon Ltd,Verizon
+Verizon Communications,Verizon
+Comcast Ltd,Comcast
+Sky UK Ltd,Sky
+Sky Broadcasting,Sky
+BBC Ltd,BBC
+British Broadcasting Corp,BBC
+Netflix Inc,Netflix
+Netflx Inc,Netflix
+Uber Technologies,Uber
+Uber Ltd,Uber
+Uber Tech,Uber
+Airbnb Inc,Airbnb
+Air BNB Ltd,Airbnb
+Deliveroo Ltd,Deliveroo
+Deliveroo Group,Deliveroo
+Just Eat Ltd,Just Eat
+Justeat Ltd,Just Eat
+Revolut Ltd,Revolut
+Revolut Bank,Revolut
+Wise Ltd,Wise
+TransferWise,Wise
+Stripe Inc,Stripe
+Stripe Payments,Stripe
+PayPal Inc,PayPal
+Pay Pal Ltd,PayPal
+Square Inc,Square
+Square Payments,Square
+Adyen Ltd,Adyen
+Adyen Payments,Adyen
+Shopify Inc,Shopify
+Shopify Commerce,Shopify
+Salesforce Inc,Salesforce
+Salesforce.com,Salesforce
+Workday Inc,Workday
+ServiceNow Inc,ServiceNow
+Service Now UK,ServiceNow
+Slack Technologies,Slack
+Slack Tech,Slack
+Zoom Video Communications,Zoom
+Zoom Ltd,Zoom
+Dropbox Inc,Dropbox
+Drop Box Ltd,Dropbox
+Box Inc,Box
+Atlassian Pty Ltd,Atlassian
+Atlssian Pty Ltd,Atlassian
+Canva Pty Ltd,Canva
+Canva Australia,Canva
+Xero Ltd,Xero
+Xero Accounting,Xero
+MYOB Ltd,MYOB
+Myob Ltd,MYOB
+Sage Ltd,Sage
+Sage Group,Sage
+QuickBooks Ltd,QuickBooks
+Quick Books Ltd,QuickBooks
+Intuit Inc,Intuit
+FreshBooks Ltd,FreshBooks
+Fresh Books Ltd,FreshBooks
+Zoho Corp,Zoho
+HubSpot Inc,HubSpot
+Hub Spot Inc,HubSpot
+Mailchimp Inc,Mailchimp
+Mail Chimp Ltd,Mailchimp
+Twilio Inc,Twilio
+Segment Inc,Segment
+Snowflake Inc,Snowflake
+Snow Flake Inc,Snowflake
+Databricks Inc,Databricks
+Data Bricks Inc,Databricks
+BlueWave Logistics Ltd,BlueWave Logistics
+Blue Wave Logistics,BlueWave Logistics
+BlueWave Logistics Pty Ltd,BlueWave Logistics
+GreenField Energy Ltd,GreenField Energy
+Green Field Energy,GreenField Energy
+NorthStar Mining Ltd,NorthStar Mining
+Southern Cross Transport Pty Ltd,Southern Cross Transport
+Southern Cross Transport,Southern Cross Transport
+UrbanBuild Constructions Ltd,UrbanBuild Constructions
+Peak Performance Fitness Ltd,Peak Performance Fitness
+Harbour Café Sydney,Harbour Café Sydney
+Oceanic Shipping Co,Oceanic Shipping
+RedRock Consulting Ltd,RedRock Consulting
+SilverLine Interiors Ltd,SilverLine Interiors
+Golden Gate Imports,Golden Gate Imports
+Everest Foods Ltd,Everest Foods
+RapidHire Recruitment,RapidHire Recruitment
+ClearView Security Ltd,ClearView Security
+BrightSpark Electrical,BrightSpark Electrical
+Sunrise Cleaning Services,Sunrise Cleaning Services
+Metro Waste Solutions,Metro Waste Solutions
+Alpha Medical Supplies,Alpha Medical Supplies
+Beta Pharma Ltd,Beta Pharma
+Gamma Retail Group,Gamma Retail Group
+Delta Engineering Ltd,Delta Engineering
+Epsilon Tech Services,Epsilon Tech Services
+Zeta Construction,Zeta Construction
+Eta Logistics Ltd,Eta Logistics
+Theta Consulting Group,Theta Consulting Group
+Iota Financial Services,Iota Financial Services
+Kappa Legal Ltd,Kappa Legal
+Lambda Property Group,Lambda Property Group
+Mu Manufacturing Ltd,Mu Manufacturing
+Nu Digital Agency,Nu Digital Agency
+Xi Trading Co,Xi Trading
+Omicron Ventures Ltd,Omicron Ventures
+Pi Analytics Ltd,Pi Analytics
+Rho Infrastructure,Rho Infrastructure
+Sigma Consulting Ltd,Sigma Consulting
+Tau Transport Services,Tau Transport Services
+Upsilon Holdings Ltd,Upsilon Holdings
+Phi Energy Ltd,Phi Energy
+Chi Foods Ltd,Chi Foods
+Psi Security Ltd,Psi Security
+Omega Services Ltd,Omega Services
+Vertex Solutions Ltd,Vertex Solutions
+Apex Group Ltd,Apex Group
+Summit Industries Ltd,Summit Industries
+Pioneer Logistics Ltd,Pioneer Logistics
+Frontier Tech Ltd,Frontier Tech
+Nexus Solutions Ltd,Nexus Solutions
+Orbit Systems Ltd,Orbit Systems
+Quantum Services Ltd,Quantum Services
+Velocity Group Ltd,Velocity Group
+Momentum Industries Ltd,Momentum Industries
+Catalyst Consulting Ltd,Catalyst Consulting
+Fusion Enterprises Ltd,Fusion Enterprises
+Synergy Solutions Ltd,Synergy Solutions
+Horizon Group Ltd,Horizon Group
+Legacy Holdings Ltd,Legacy Holdings
+Prime Services Ltd,Prime Services
+CoreTech Solutions Ltd,CoreTech Solutions
+NextGen Systems Ltd,NextGen Systems
+GlobalEdge Ltd,GlobalEdge
+TerraFirma Ltd,TerraFirma
+IronClad Services Ltd,IronClad Services
+Skyline Developments Ltd,Skyline Developments
+Evergreen Solutions Ltd,Evergreen Solutions
+BlueSky Ventures Ltd,BlueSky Ventures
+SilverOak Ltd,SilverOak
+GoldenLeaf Ltd,GoldenLeaf
+RedLine Services Ltd,RedLine Services
+WhitePeak Ltd,WhitePeak
+BlackStone Ltd,BlackStone
