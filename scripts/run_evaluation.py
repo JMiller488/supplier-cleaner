@@ -13,7 +13,7 @@ from itertools import combinations
 
 import matplotlib.pyplot as plt
 
-from supplier_cleaner.evaluate import NamePair, score_pairs, sweep_thresholds
+from supplier_cleaner.evaluate import (NamePair,score_pairs,score_pairs_tfidf,sweep_thresholds,)
 
 DEFAULT_THRESHOLD = 0.85
 
@@ -64,61 +64,62 @@ def load_pairs(csv_path: str) -> list[NamePair]:
 # ---------------------------------------------------------------------------
 
 
-def plot_precision_recall(results, output_path: str, default_threshold: float) -> None:
-    """Plot precision and recall curves across thresholds and save to file.
+def plot_precision_recall(
+    results_by_method: dict[str, list],
+    output_path: str,
+    default_threshold: float,
+) -> None:
+    """Plot precision and recall curves for one or more scoring methods.
 
-    Draws both curves on the same axes, adds a vertical line at the
-    default threshold, and annotates the precision and recall values
-    at that threshold.
+    Each method gets its own pair of precision/recall lines. A vertical
+    line marks the default threshold.
 
     Args:
-        results: List of ThresholdResult objects from sweep_thresholds().
+        results_by_method: Dict mapping method name to list of ThresholdResult.
         output_path: File path to save the plot image.
         default_threshold: The threshold to highlight on the plot.
     """
-    thresholds = [r.threshold for r in results]
-    precisions = [r.precision for r in results]
-    recalls = [r.recall for r in results]
+    method_colours = {
+        "Sentence Transformer": "#378ADD",
+        "TF-IDF (char n-grams)": "#E8913A",
+    }
 
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    ax.plot(thresholds, precisions, label="Precision", color="#378ADD", linewidth=2)
-    ax.plot(thresholds, recalls, label="Recall", color="#1D9E75", linewidth=2)
+    for method_name, results in results_by_method.items():
+        colour = method_colours.get(method_name, "#888888")
+        thresholds = [r.threshold for r in results]
+        precisions = [r.precision for r in results]
+        recalls = [r.recall for r in results]
 
-    # Find the result closest to the default threshold
-    closest = min(results, key=lambda r: abs(r.threshold - default_threshold))
+        ax.plot(
+            thresholds, precisions,
+            label=f"{method_name} — Precision",
+            color=colour,
+            linewidth=2,
+        )
+        ax.plot(
+            thresholds, recalls,
+            label=f"{method_name} — Recall",
+            color=colour,
+            linewidth=2,
+            linestyle="--",
+        )
 
-    # Vertical line at default threshold
     ax.axvline(
-        x=closest.threshold,
+        x=default_threshold,
         color="#E24B4A",
-        linestyle="--",
+        linestyle=":",
         linewidth=1.5,
         label=f"Default threshold (τ={default_threshold})",
     )
 
-    # Annotate precision and recall at default threshold
-    ax.annotate(
-        f"P={closest.precision:.2f}",
-        xy=(closest.threshold, closest.precision),
-        xytext=(closest.threshold + 0.03, closest.precision - 0.08),
-        color="#378ADD",
-        fontsize=10,
-    )
-    ax.annotate(
-        f"R={closest.recall:.2f}",
-        xy=(closest.threshold, closest.recall),
-        xytext=(closest.threshold + 0.03, closest.recall + 0.04),
-        color="#1D9E75",
-        fontsize=10,
-    )
-
     ax.set_xlabel("Threshold (τ)", fontsize=12)
     ax.set_ylabel("Score", fontsize=12)
-    ax.set_title("Precision and Recall vs Threshold", fontsize=13)
+    ax.set_title("Precision and Recall vs Threshold — Method Comparison", fontsize=13)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1.05)
-    ax.legend(fontsize=10)
+    ax.legend(fontsize=9, loc="center left")
     ax.grid(True, alpha=0.3)
 
     fig.tight_layout()
@@ -139,20 +140,40 @@ if __name__ == "__main__":
     pairs = load_pairs(csv_path)
     print(f"  {len(pairs)} pairs loaded")
 
-    print("Scoring pairs (this may take a moment)...")
-    scored = score_pairs(pairs)
+    # --- Sentence Transformer scoring ---
+    print("Scoring pairs with Sentence Transformer...")
+    scored_st = score_pairs(pairs)
     print("  Scoring complete")
 
-    print("Sweeping thresholds...")
-    results = sweep_thresholds(scored)
+    print("Sweeping thresholds (Sentence Transformer)...")
+    results_st = sweep_thresholds(scored_st)
     print("  Sweep complete")
 
-    # Print a summary table around the default threshold
-    print(f"\n{'Threshold':>10} {'Precision':>10} {'Recall':>10}")
-    print("-" * 32)
-    for r in results:
-        if 0.70 <= r.threshold <= 0.95:
-            marker = " <--" if abs(r.threshold - DEFAULT_THRESHOLD) < 0.001 else ""
-            print(f"{r.threshold:>10.2f} {r.precision:>10.2f} {r.recall:>10.2f}{marker}")
+    # --- TF-IDF scoring ---
+    print("Scoring pairs with TF-IDF...")
+    scored_tfidf = score_pairs_tfidf(pairs)
+    print("  Scoring complete")
 
-    plot_precision_recall(results, plot_path, DEFAULT_THRESHOLD)
+    print("Sweeping thresholds (TF-IDF)...")
+    results_tfidf = sweep_thresholds(scored_tfidf)
+    print("  Sweep complete")
+
+    # --- Summary table ---
+    print(f"\n{'Threshold':>10} {'ST Prec':>10} {'ST Rec':>10} {'TFIDF Prec':>12} {'TFIDF Rec':>10}")
+    print("-" * 54)
+    for r_st, r_tfidf in zip(results_st, results_tfidf):
+        if 0.70 <= r_st.threshold <= 0.95:
+            marker = " <--" if abs(r_st.threshold - DEFAULT_THRESHOLD) < 0.001 else ""
+            print(
+                f"{r_st.threshold:>10.2f}"
+                f" {r_st.precision:>10.2f} {r_st.recall:>10.2f}"
+                f" {r_tfidf.precision:>12.2f} {r_tfidf.recall:>10.2f}"
+                f"{marker}"
+            )
+
+    # --- Plot ---
+    results_by_method = {
+        "Sentence Transformer": results_st,
+        "TF-IDF (char n-grams)": results_tfidf,
+    }
+    plot_precision_recall(results_by_method, plot_path, DEFAULT_THRESHOLD)

@@ -11,6 +11,8 @@ Provides functions to:
 
 from dataclasses import dataclass
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
 
@@ -79,7 +81,43 @@ def score_pairs(
 
     return scored
 
+def score_pairs_tfidf(
+    pairs: list[NamePair],
+    ngram_range: tuple[int, int] = (2, 4),
+    analyzer: str = "char_wb",
+) -> list[tuple[NamePair, float]]:
+    """Compute TF-IDF cosine similarity for each name pair.
 
+    Fits a TfidfVectorizer on all unique names using character n-grams,
+    then computes cosine similarity between the resulting sparse vectors.
+
+    This provides a simple, interpretable baseline — similarity is driven
+    entirely by shared character sequences, with no learned representations.
+
+    Args:
+        pairs: List of labelled NamePair objects.
+        ngram_range: Min and max character n-gram lengths. (2, 4) generates
+            bigrams, trigrams, and 4-grams.
+        analyzer: 'char_wb' generates n-grams within word boundaries only.
+            'char' ignores word boundaries.
+
+    Returns:
+        List of (NamePair, similarity_score) tuples.
+    """
+    all_names = list({name for pair in pairs for name in (pair.name_a, pair.name_b)})
+
+    vectorizer = TfidfVectorizer(analyzer=analyzer, ngram_range=ngram_range)
+    tfidf_matrix = vectorizer.fit_transform(all_names)
+    name_to_idx = {name: idx for idx, name in enumerate(all_names)}
+
+    scored = []
+    for pair in pairs:
+        idx_a = name_to_idx[pair.name_a]
+        idx_b = name_to_idx[pair.name_b]
+        similarity = float(cosine_similarity(tfidf_matrix[idx_a], tfidf_matrix[idx_b])[0,0])
+        scored.append((pair, similarity))
+
+    return scored
 def precision_recall_at_threshold(
     scored_pairs: list[tuple[NamePair, float]],
     threshold: float,

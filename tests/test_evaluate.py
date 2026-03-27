@@ -10,7 +10,7 @@ can be verified without running the embedding model.
 
 import pytest
 
-from supplier_cleaner.evaluate import NamePair, precision_recall_at_threshold
+from supplier_cleaner.evaluate import NamePair, precision_recall_at_threshold, score_pairs_tfidf
 
 
 def make_scored_pairs(similarities: list[float], matches: list[bool]):
@@ -89,3 +89,27 @@ def test_no_predictions_made():
     result = precision_recall_at_threshold(scored, threshold=0.85)
     assert result.precision == pytest.approx(1.0)
     assert result.recall == pytest.approx(0.0)
+
+
+def test_tfidf_identical_names_score_one():
+    """Identical names should have a TF-IDF cosine similarity of 1.0."""
+    pairs = [NamePair(name_a="accenture consulting", name_b="accenture consulting", match=True)]
+    scored = score_pairs_tfidf(pairs)
+    _, similarity = scored[0]
+    assert similarity == pytest.approx(1.0)
+
+
+def test_tfidf_unrelated_names_score_low():
+    """Completely unrelated names should have near-zero similarity."""
+    pairs = [NamePair(name_a="accenture consulting", name_b="woolworths group", match=False)]
+    scored = score_pairs_tfidf(pairs)
+    _, similarity = scored[0]
+    assert similarity < 0.3
+
+
+def test_tfidf_typo_scores_high():
+    """A minor typo should still produce a high similarity score."""
+    pairs = [NamePair(name_a="accenture consulting", name_b="accentre consulting", match=True)]
+    scored = score_pairs_tfidf(pairs)
+    _, similarity = scored[0]
+    assert similarity > 0.7
