@@ -36,17 +36,19 @@ class NamePair:
 
 @dataclass
 class ThresholdResult:
-    """Precision and recall at a single threshold value.
+    """Precision, recall, and F1 at a single threshold value.
 
     Attributes:
         threshold: The cosine similarity threshold used.
         precision: TP / (TP + FP). How many predicted matches were correct.
         recall: TP / (TP + FN). How many true matches were found.
+        f1: Harmonic mean of precision and recall.
     """
 
     threshold: float
     precision: float
     recall: float
+    f1: float
 
 
 def score_pairs(
@@ -174,8 +176,9 @@ def precision_recall_at_threshold(
 
     precision = tp / (tp + fp) if (tp + fp) > 0 else 1.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
 
-    return ThresholdResult(threshold=threshold, precision=precision, recall=recall)
+    return ThresholdResult(threshold=threshold, precision=precision, recall=recall, f1=f1)
 
 
 def sweep_thresholds(
