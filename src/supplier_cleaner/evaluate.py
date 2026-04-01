@@ -10,7 +10,7 @@ Provides functions to:
 """
 
 from dataclasses import dataclass
-
+from rapidfuzz import fuzz
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
@@ -118,6 +118,34 @@ def score_pairs_tfidf(
         scored.append((pair, similarity))
 
     return scored
+
+def score_pairs_levenshtein(
+    pairs: list[NamePair],
+) -> list[tuple[NamePair, float]]:
+    """Compute normalised Levenshtein similarity for each name pair.
+
+    Uses rapidfuzz's ratio function, which returns a value from 0 to 100
+    representing the normalised edit distance similarity. This is divided
+    by 100 to produce a score in [0, 1].
+
+    This is the simplest possible string similarity method — it counts
+    the minimum number of single-character edits (insertions, deletions,
+    substitutions) needed to transform one string into the other, then
+    normalises by string length.
+
+    Args:
+        pairs: List of labelled NamePair objects.
+
+    Returns:
+        List of (NamePair, similarity_score) tuples.
+    """
+    scored = []
+    for pair in pairs:
+        similarity = fuzz.ratio(pair.name_a, pair.name_b) / 100
+        scored.append((pair, similarity))
+
+    return scored
+
 def precision_recall_at_threshold(
     scored_pairs: list[tuple[NamePair, float]],
     threshold: float,
