@@ -91,6 +91,36 @@ def test_no_predictions_made():
     assert result.recall == pytest.approx(0.0)
 
 
+def test_f1_perfect_predictions():
+    """F1 should be 1.0 when precision and recall are both 1.0."""
+    scored = make_scored_pairs(
+        similarities=[0.90, 0.92, 0.40, 0.30],
+        matches=    [True, True, False, False],
+    )
+    result = precision_recall_at_threshold(scored, threshold=0.85)
+    assert result.f1 == pytest.approx(1.0)
+
+
+def test_f1_with_false_positive():
+    """F1 should be 0.5 when precision=0.5 and recall=0.5."""
+    scored = make_scored_pairs(
+        similarities=[0.90, 0.90, 0.70],
+        matches=    [True, False, True],
+    )
+    result = precision_recall_at_threshold(scored, threshold=0.85)
+    assert result.f1 == pytest.approx(0.5)
+
+
+def test_f1_zero_when_no_predictions():
+    """F1 should be 0.0 when recall is 0 (no predictions made)."""
+    scored = make_scored_pairs(
+        similarities=[0.60, 0.70],
+        matches=    [True, True],
+    )
+    result = precision_recall_at_threshold(scored, threshold=0.85)
+    assert result.f1 == pytest.approx(0.0)
+
+
 def test_tfidf_identical_names_score_one():
     """Identical names should have a TF-IDF cosine similarity of 1.0."""
     pairs = [NamePair(name_a="accenture consulting", name_b="accenture consulting", match=True)]
