@@ -13,7 +13,7 @@ from itertools import combinations
 
 import matplotlib.pyplot as plt
 
-from supplier_cleaner.evaluate import (NamePair,score_pairs,score_pairs_tfidf,sweep_thresholds,)
+from supplier_cleaner.evaluate import (NamePair,score_pairs,score_pairs_tfidf,score_pairs_levenshtein,sweep_thresholds,)
 
 DEFAULT_THRESHOLD = 0.85
 
@@ -82,6 +82,7 @@ def plot_precision_recall(
     method_colours = {
         "Sentence Transformer": "#378ADD",
         "TF-IDF (char n-grams)": "#E8913A",
+        "Levenshtein": "#2ECC71",
     }
 
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -158,16 +159,31 @@ if __name__ == "__main__":
     results_tfidf = sweep_thresholds(scored_tfidf)
     print("  Sweep complete")
 
+    # --- Levenshtein scoring ---
+    print("Scoring pairs with Levenshtein...")
+    scored_lev = score_pairs_levenshtein(pairs)
+    print("  Scoring complete")
+
+    print("Sweeping thresholds (Levenshtein)...")
+    results_lev = sweep_thresholds(scored_lev)
+    print("  Sweep complete")
+
     # --- Summary table ---
-    print(f"\n{'Threshold':>10} {'ST Prec':>10} {'ST Rec':>10} {'TFIDF Prec':>12} {'TFIDF Rec':>10}")
-    print("-" * 54)
-    for r_st, r_tfidf in zip(results_st, results_tfidf):
+    print(
+        f"\n{'Threshold':>10}"
+        f" {'ST Prec':>10} {'ST Rec':>10}"
+        f" {'TFIDF Prec':>12} {'TFIDF Rec':>10}"
+        f" {'Lev Prec':>10} {'Lev Rec':>10}"
+    )
+    print("-" * 74)
+    for r_st, r_tfidf, r_lev in zip(results_st, results_tfidf, results_lev):
         if 0.70 <= r_st.threshold <= 0.95:
             marker = " <--" if abs(r_st.threshold - DEFAULT_THRESHOLD) < 0.001 else ""
             print(
                 f"{r_st.threshold:>10.2f}"
                 f" {r_st.precision:>10.2f} {r_st.recall:>10.2f}"
                 f" {r_tfidf.precision:>12.2f} {r_tfidf.recall:>10.2f}"
+                f" {r_lev.precision:>10.2f} {r_lev.recall:>10.2f}"
                 f"{marker}"
             )
 
@@ -175,5 +191,6 @@ if __name__ == "__main__":
     results_by_method = {
         "Sentence Transformer": results_st,
         "TF-IDF (char n-grams)": results_tfidf,
+        "Levenshtein": results_lev,
     }
     plot_precision_recall(results_by_method, plot_path, DEFAULT_THRESHOLD)
