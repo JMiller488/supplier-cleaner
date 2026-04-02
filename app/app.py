@@ -80,7 +80,7 @@ def run_pipeline(df: pd.DataFrame, supplier_col: str, threshold: float) -> pd.Da
     df["Supplier"] = df[supplier_col].astype(str)
     df["Supplier preprocessed"] = df["Supplier"].apply(preprocess_supplier_name)
 
-    unique_names = df["Supplier preprocessed"].tolist()
+    unique_names = df["Supplier preprocessed"].unique().tolist()
     supplier_groups = group_suppliers(unique_names, threshold=threshold)
 
     df["Supplier grouped"] = df["Supplier preprocessed"].map(supplier_groups)
@@ -142,7 +142,7 @@ def main() -> None:
     st.subheader("Settings")
     threshold = st.slider(
         "Similarity threshold for grouping",
-        min_value=0.70,
+        min_value=0.50,
         max_value=0.99,
         value=0.69,
         step=0.01,
