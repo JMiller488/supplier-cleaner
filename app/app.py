@@ -2,13 +2,12 @@
 app.py
 ------
 Streamlit web application for the supplier name cleaning pipeline.
-Provides a UI for uploading data, detecting the supplier column,
+Provides a UI for uploading data, selecting the supplier column,
 running the cleaning pipeline, and downloading results.
 """
 
 import io
 
-import ollama
 import pandas as pd
 import streamlit as st
 
@@ -19,42 +18,6 @@ from supplier_cleaner.grouping import group_suppliers
 # ── Page config ───────────────────────────────────────────────────────────────
 
 st.set_page_config(page_title="Supplier Cleaner", page_icon="🏭", layout="wide")
-
-
-# ── Column detection ──────────────────────────────────────────────────────────
-
-
-def detect_supplier_column(df: pd.DataFrame) -> str | None:
-    """Use Mistral via Ollama to identify the supplier name column.
-
-    Sends column names and sample values to a local Mistral model,
-    which returns its best guess at which column contains supplier names.
-    Falls back to None if detection fails or the response is ambiguous.
-
-    Args:
-        df: Input DataFrame.
-
-    Returns:
-        Column name string if detected, otherwise None.
-    """
-    samples = {col: df[col].dropna().astype(str).head(5).tolist() for col in df.columns}
-    prompt = f"""You are analyzing a spreadsheet. Here are the column names and 5 sample values from each:
-
-{samples}
-
-Which column contains supplier or vendor company names?
-Respond with ONLY the exact column name, nothing else."""
-
-    try:
-        response = ollama.chat(
-            model="mistral", messages=[{"role": "user", "content": prompt}]
-        )
-        detected = response["message"]["content"].strip().strip('"').strip("'")
-        return detected if detected in df.columns else None
-    except ConnectionError:
-        return "OLLAMA_UNAVAILABLE"
-    except Exception:
-        return None
 
 
 # ── Pipeline ──────────────────────────────────────────────────────────────────
@@ -94,7 +57,8 @@ def main() -> None:
     """Render the Streamlit application."""
     st.title("Supplier Name Cleaner")
     st.caption(
-        "Upload any Excel or CSV file — Mistral will detect the supplier column automatically."
+        "Upload an Excel or CSV file, pick the supplier column, "
+        "and download a cleaned and grouped output."
     )
 
     uploaded_file = st.file_uploader(
@@ -113,26 +77,11 @@ def main() -> None:
     st.subheader("File preview")
     st.dataframe(df.head(5), use_container_width=True)
 
-    # ── Column detection ──────────────────────────────────────────────────────
-    st.subheader("Column detection")
-    with st.spinner("Asking Mistral to identify the supplier column..."):
-        detected = detect_supplier_column(df)
-
-    if detected == "OLLAMA_UNAVAILABLE":
-        detected = None
-        st.info(
-            "Ollama is not running — column auto-detection is disabled. "
-            "Select the supplier column manually below."
-        )
-    elif detected:
-        st.success(f"Mistral identified **{detected}** as the supplier column.")
-    else:
-        st.warning("Mistral could not confidently detect the supplier column.")
-
+    # ── Column selection ──────────────────────────────────────────────────────
+    st.subheader("Select supplier column")
     supplier_col = st.selectbox(
-        "Confirm or change the supplier column:",
+        "Which column contains the supplier names?",
         options=list(df.columns),
-        index=list(df.columns).index(detected) if detected else 0,
     )
 
     st.write("**5 sample values from selected column:**")
