@@ -11,7 +11,7 @@ from sentence_transformers import SentenceTransformer, util
 
 
 DEFAULT_MODEL = "all-MiniLM-L6-v2"
-DEFAULT_THRESHOLD = 0.85
+DEFAULT_THRESHOLD = 0.69
 
 
 def build_similarity_graph(
