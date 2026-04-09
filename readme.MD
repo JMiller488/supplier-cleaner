@@ -104,15 +104,7 @@ A naive greedy approach assigns group labels based on whichever name appears fir
 streamlit run app/app.py
 ```
 
-Upload a CSV or Excel file. The app works without Ollama — select the supplier column manually from the dropdown. Optionally, a local Mistral model (via Ollama) can automatically detect the supplier name column. Set the similarity threshold using the slider, then click Clean Suppliers. The output adds three columns to the original file: raw name, preprocessed name, and canonical group name. The file is downloadable as Excel.
-
-Ollama is optional — only needed for automatic column detection (supporting European tech!):
-
-```bash
-ollama pull mistral
-```
-
----
+Upload a CSV or Excel file and select the supplier column manually from the dropdown. Set the similarity threshold using the slider, then click Clean Suppliers. The output adds three columns to the original file: raw name, preprocessed name, and canonical group name. The file is downloadable as Excel.
 
 ## Project Structure
 
@@ -155,7 +147,7 @@ streamlit run app/app.py
 python analysis/scripts/run_evaluation.py
 ```
 
-**Requirements:** Python 3.10+. Ollama with Mistral is optional — only needed for automatic column detection in the web app.
+**Requirements:** Python 3.10+.
 
 ## Tech Stack
 
@@ -165,7 +157,6 @@ python analysis/scripts/run_evaluation.py
 - `pandas` — data handling
 - `scikit-learn` — TF-IDF vectorisation (evaluation baseline)
 - `rapidfuzz` — Levenshtein distance (evaluation baseline)
-- `ollama` — local LLM for automatic column detection
 - `matplotlib` — precision/recall curve plotting
 
 
