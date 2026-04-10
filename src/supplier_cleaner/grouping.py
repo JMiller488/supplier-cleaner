@@ -2,11 +2,15 @@
 grouping.py
 -----------
 Groups similar supplier names using sentence embeddings and
-cosine similarity. Implements a connected-components approach
-via NetworkX to produce stable, order-independent groupings.
+cosine similarity. Implements complete linkage hierarchical
+clustering to produce strict, transitive-free groupings where
+every pair of suppliers within a group directly exceeds the
+similarity threshold.
 """
 
-import networkx as nx
+import numpy as np
+from scipy.cluster.hierarchy import fcluster, linkage
+from scipy.spatial.distance import squareform
 from sentence_transformers import SentenceTransformer, util
 
 
@@ -14,62 +18,58 @@ DEFAULT_MODEL = "all-MiniLM-L6-v2"
 DEFAULT_THRESHOLD = 0.69
 
 
-def build_similarity_graph(
-    names: list[str], model: SentenceTransformer, threshold: float = DEFAULT_THRESHOLD
-) -> nx.Graph:
-    """Build a graph where edges connect names above the similarity threshold.
-
-    Each name is a node. An edge is added between two names if their
-    cosine similarity meets or exceeds the threshold.
-
-    Args:
-        names: List of preprocessed supplier name strings.
-        model: A loaded SentenceTransformer model.
-        threshold: Minimum cosine similarity to consider two names equivalent.
-
-    Returns:
-        A NetworkX Graph object.
-    """
-    embeddings = model.encode(names, convert_to_tensor=True)
-    cos_sim_matrix = util.cos_sim(embeddings, embeddings)
-
-    graph = nx.Graph()
-    graph.add_nodes_from(names)
-
-    for i in range(len(names)):
-        for j in range(i + 1, len(names)):
-            if cos_sim_matrix[i][j] >= threshold:
-                graph.add_edge(names[i], names[j])
-
-    return graph
-
-
 def group_suppliers(
     names: list[str],
     threshold: float = DEFAULT_THRESHOLD,
     model_name: str = DEFAULT_MODEL,
 ) -> dict[str, str]:
-    """Group similar supplier names using connected components.
+    """Group similar supplier names using complete linkage hierarchical clustering.
 
-    Each connected component in the similarity graph is treated as a
-    group. All names in a component are mapped to the same canonical
-    name — the first name in the component alphabetically, for stability.
+    Two suppliers are placed in the same group if and only if every pair of
+    suppliers within that group has a cosine similarity >= threshold. This avoids
+    the transitive grouping problem of connected-components approaches, where A
+    and C could be grouped via B even if A and C are dissimilar.
 
     Args:
         names: List of preprocessed supplier name strings.
-        threshold: Minimum cosine similarity to consider two names equivalent.
+        threshold: Minimum cosine similarity required between every pair in a group.
         model_name: HuggingFace model name for SentenceTransformer.
 
     Returns:
-        Dict mapping each input name to its canonical group name.
+        Dict mapping each input name to its canonical group name (alphabetically
+        first within the group).
     """
+    if len(names) == 1:
+        return {names[0]: names[0]}
+
     model = SentenceTransformer(model_name)
-    graph = build_similarity_graph(names, model, threshold)
+    embeddings = model.encode(names, convert_to_tensor=False)
+
+    cos_sim_matrix = util.cos_sim(embeddings, embeddings).numpy()
+
+    # Convert similarity to distance; use float64 and symmetrise to guard
+    # against the small asymmetries introduced by float32 sentence-transformer output.
+    dist_matrix = np.clip(1.0 - cos_sim_matrix.astype(np.float64), 0.0, 2.0)
+    dist_matrix = (dist_matrix + dist_matrix.T) / 2.0
+    np.fill_diagonal(dist_matrix, 0.0)
+
+    condensed = squareform(dist_matrix)
+    Z = linkage(condensed, method="complete")
+
+    # In distance space, the cutoff is 1 - threshold.
+    # fcluster groups items whose complete-linkage distance <= dist_threshold,
+    # which means every pairwise similarity within the group >= threshold.
+    dist_threshold = 1.0 - threshold
+    labels = fcluster(Z, t=dist_threshold, criterion="distance")
+
+    clusters: dict[int, list[str]] = {}
+    for name, label in zip(names, labels):
+        clusters.setdefault(int(label), []).append(name)
 
     groups = {}
-    for component in nx.connected_components(graph):
-        canonical = sorted(component)[0]
-        for name in component:
+    for cluster_names in clusters.values():
+        canonical = sorted(cluster_names)[0]
+        for name in cluster_names:
             groups[name] = canonical
 
     return groups
