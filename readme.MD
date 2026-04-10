@@ -21,7 +21,7 @@ The simplest baseline. Measures the minimum number of character edits (insertion
 The next level of complexity. Each supplier name is represented as a sparse vector of character n-gram (2–4 character) TF-IDF weights. Cosine similarity between these vectors then measures character-level overlap. No learned representations, fully interpretable, and near-instant to compute. No "knowledge" of the world outside of the dataset provided.
 
 **Sentence Transformer embeddings**
-The most complex model. Each name is mapped to some dense vector in R^384 using `all-MiniLM-L6-v2`. Semantically similar words will map to vectors pointing in roughly the same direction. We then compute the cosine similarity matrix on all pairs. Pairs scoring above a configurable threshold are connected as edges in a graph; connected components of that graph form the final groups, with the canonical name selected alphabetically for stability. Note, this embedding model has been pre-trained and finetuned on a large external corpus - therefore it is the first of our methods to incorporate some knowledge from outside the dataset provided.
+The most complex model. Each name is mapped to some dense vector in R^384 using `all-MiniLM-L6-v2`. Semantically similar words will map to vectors pointing in roughly the same direction. We then compute the cosine similarity matrix on all pairs. Pairs scoring above a configurable threshold are grouped using complete linkage hierarchical clustering, where every pair within a group must directly exceed the threshold. The canonical name is selected alphabetically for stability. Note, this embedding model has been pre-trained and finetuned on a large external corpus - therefore it is the first of our methods to incorporate some knowledge from outside the dataset provided.
 
 ### Results
 
@@ -84,11 +84,13 @@ The pipeline runs in three stages:
 
 1. **Preprocessing** — rule-based normalisation: lowercasing, stop word removal (legal suffixes, generic business terms), Australian state name abbreviation, ordinal standardisation, punctuation stripping
 2. **Embedding** — each preprocessed name is mapped to a 384-dimensional vector using `all-MiniLM-L6-v2`
-3. **Grouping** — cosine similarity is computed across all vectors; pairs above a configurable threshold are connected as edges in a graph, connected components of that graph form the final groups, and the canonical name for each group is selected alphabetically for stability
+3. **Grouping** — cosine similarity is computed across all vectors; complete linkage hierarchical clustering then groups names such that every pair within a group directly exceeds the threshold. The canonical name for each group is selected alphabetically for stability.
 
-### Why connected components?
+### Grouping algorithm — from connected components to complete linkage
 
-A naive greedy approach assigns group labels based on whichever name appears first in the data — making results order-dependent and unstable. The connected components approach treats clustering as a graph problem: names are nodes, similarity above the threshold creates edges, and NetworkX identifies all clusters. The result is identical regardless of input order.
+The initial implementation used connected components: any two suppliers reachable via a chain of above-threshold edges were merged into the same group. I ran this on some client data and this transitivity produced weak groupings. Like Chinese whispers, a sequence of marginal similarities could bridge and group two suppliers that were themselves quite dissimilar.
+
+The grouping step was therefore replaced with **complete linkage hierarchical clustering**, where two suppliers share a canonical name if and only if every pair within their group exceeds the threshold.
 
 ### Model choice
 
@@ -112,7 +114,7 @@ Upload a CSV or Excel file and select the supplier column manually from the drop
 supplier-cleaner/
 ├── src/supplier_cleaner/
 │   ├── preprocessing.py        # Text normalisation
-│   ├── grouping.py             # Embedding + graph-based grouping
+│   ├── grouping.py             # Embedding + complete linkage grouping
 │   └── evaluate.py             # Precision/recall evaluation
 ├── analysis/
 │   ├── scripts/
@@ -152,7 +154,7 @@ python analysis/scripts/run_evaluation.py
 ## Tech Stack
 
 - `sentence-transformers` — text embeddings
-- `networkx` — graph-based connected components grouping
+- `scipy` — complete linkage hierarchical clustering
 - `streamlit` — web interface
 - `pandas` — data handling
 - `scikit-learn` — TF-IDF vectorisation (evaluation baseline)
