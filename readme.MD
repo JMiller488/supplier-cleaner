@@ -92,6 +92,12 @@ The initial implementation used connected components: any two suppliers reachabl
 
 The grouping step was therefore replaced with **complete linkage hierarchical clustering**, where two suppliers share a canonical name if and only if every pair within their group exceeds the threshold.
 
+### Why not just use an LLM
+
+A natural question for a 2026 portfolio piece. The supplier de-duplication problem is fundamentally an O(n^2) problem - every pair of names must be compared. With 500 suppliers that's 125,000 comparisons; with 5,000 it's 12.5 million. A cosine-similarity lookup against precomputed embeddings runs in microseconds and costs nothing, while an LLM call takes seconds and costs cents. 
+
+Where an LLM excels is in the "last-mile" of the pipeline. Running an LLM over the final clusters, it can verify potential issues such as acronyms (PwC / PriceWaterHouseCoopers), or weak canonical name selection (choosing the "dirtiest" canonical name in the cluster).
+
 ### Model choice
 
 `all-MiniLM-L6-v2` was chosen because:
