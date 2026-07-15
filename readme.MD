@@ -88,7 +88,7 @@ The pipeline runs in three stages:
 
 ### Grouping algorithm — from connected components to complete linkage
 
-The initial implementation used connected components: any two suppliers reachable via a chain of above-threshold edges were merged into the same group. I ran this on some client data and this transitivity produced weak groupings. Like Chinese whispers, a sequence of marginal similarities could bridge and group two suppliers that were themselves quite dissimilar.
+The initial implementation used connected components: any two suppliers reachable via a chain of above-threshold edges were merged into the same group. I ran this on some real procurement data and this transitivity produced weak groupings. Like Chinese whispers, a sequence of marginal similarities could bridge and group two suppliers that were themselves quite dissimilar.
 
 The grouping step was therefore replaced with **complete linkage hierarchical clustering**, where two suppliers share a canonical name if and only if every pair within their group exceeds the threshold.
 
