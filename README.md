@@ -147,6 +147,7 @@ cd supplier-cleaner
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -e ".[dev]"
 
 # Run the web app
 streamlit run app/app.py
